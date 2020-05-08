@@ -1,1 +1,1 @@
-# react-typescript-template
+# strava-aggregator-client
