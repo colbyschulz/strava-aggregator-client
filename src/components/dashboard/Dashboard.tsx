@@ -1,24 +1,20 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { Wrapper } from './Dashboard.css';
-import { useParams } from 'react-router-dom';
+import { api, API_URL, API_METHOD } from '../../api';
 
 const Dashboard: FC = () => {
-  const params = useParams();
-  console.log(params);
+  const [athlete, setAthlete] = useState<Athlete>({});
+  const fetchAthlete = async () => {
+    const athlete = await api(API_URL.athlete, API_METHOD.GET);
+    setAthlete(athlete);
+  };
 
-  React.useEffect(() => {
-    console.log(params);
-  }, [params]);
+  useEffect(() => {
+    fetchAthlete();
+  }, []);
 
-  return (
-    <Wrapper>
-      Dashboard
-      <a href="http://www.strava.com/oauth/authorize?client_id=47529&response_type=code&redirect_uri=http://localhost:8080/exchange_token&approval_prompt=force&scope=read">
-        Authorize
-      </a>
-    </Wrapper>
-  );
+  return <Wrapper>Hi {athlete.firstname}</Wrapper>;
 };
 
 export default Dashboard;
