@@ -1,16 +1,14 @@
 import React, { FC } from 'react';
 
-import { Switch, Route, useHistory, useLocation } from 'react-router-dom';
+import { Switch, Route, useLocation } from 'react-router-dom';
 import Dashboard from '../dashboard/Dashboard';
 import LoginPage from '../authorizationPage';
+import { hasValidToken } from '../../api';
 
 const App: FC = () => {
-  const history = useHistory();
   const location = useLocation();
   React.useEffect(() => {
-    const accessToken = localStorage.getItem('seltzerAccess');
-
-    if (!accessToken && location.pathname !== '/exchange_token') {
+    if (!hasValidToken() && location.pathname !== '/exchange_token') {
       window.location.assign(
         'http://www.strava.com/oauth/authorize?client_id=47529&response_type=code&redirect_uri=http://localhost:8080/exchange_token&approval_prompt=force&scope=read',
       );

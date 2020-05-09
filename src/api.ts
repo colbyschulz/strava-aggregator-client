@@ -8,16 +8,36 @@ export enum API_METHOD {
   POST = 'POST',
 }
 
+export const hasValidToken = () => {
+  const accessToken = localStorage.getItem('seltzerAccess');
+  const tokenExpiration = parseInt(localStorage.getItem('seltzerExpiration'));
+  const now = new Date();
+  const secondsSinceEpoch = Math.round(now.getTime() / 1000);
+  const tokenIsExpired = secondsSinceEpoch > tokenExpiration;
+
+  return accessToken && !tokenIsExpired;
+};
+
 export const api = async (url: API_URL, method: API_METHOD, body?: {}, callback?: () => void) => {
   const accessToken = localStorage.getItem('seltzerAccess');
+  const refreshToken = localStorage.getItem('seltzerRefresh');
+
+  if (!hasValidToken()) {
+    if (refreshToken) {
+      window.location.assign('http://localhost:8080/exchange-token');
+    } else {
+      window.location.assign(
+        'http://www.strava.com/oauth/authorize?client_id=47529&response_type=code&redirect_uri=http://localhost:8080/exchange_token&approval_prompt=force&scope=read',
+      );
+    }
+  }
+
   const requestBody: RequestInit = {
     method,
     headers: {
       'Content-Type': 'application/json',
     },
   };
-
-  console.log('accessToken', accessToken);
 
   if (accessToken) {
     requestBody.headers = {
@@ -31,8 +51,6 @@ export const api = async (url: API_URL, method: API_METHOD, body?: {}, callback?
   }
 
   const response = await fetch(url, requestBody);
-  console.log('api response', response);
-
   const responseBody = await response.json();
   return responseBody;
 };
