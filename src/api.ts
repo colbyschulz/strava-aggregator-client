@@ -1,9 +1,12 @@
 import { handleAuthorization } from './utils';
 
-export enum API_URL {
-  authenticate = 'https://www.strava.com/oauth/token',
-  athlete = 'https://www.strava.com/api/v3/athlete',
-}
+export const API_URL = {
+  authenticate: 'https://www.strava.com/oauth/token',
+  athlete: 'https://www.strava.com/api/v3/athlete',
+  getClubs: 'https://www.strava.com/api/v3/athlete/clubs',
+  getClub: (id: string) => `https://www.strava.com/api/v3/clubs/${id}`,
+  getClubActivities: (id: string) => `https://www.strava.com/api/v3/clubs/${id}/activities`,
+};
 
 export enum API_METHOD {
   GET = 'GET',
@@ -20,7 +23,7 @@ export const hasValidToken = () => {
   return Boolean(accessToken && !tokenIsExpired);
 };
 
-export const api = async (url: API_URL, method: API_METHOD, body?: {}, callback?: () => void) => {
+export const api = async (url: string, method: API_METHOD, body?: {}, callback?: () => void) => {
   const accessToken = localStorage.getItem('seltzerAccess');
   const refreshToken = localStorage.getItem('seltzerRefresh');
 
