@@ -1,3 +1,5 @@
+import { handleAuthorization } from './utils';
+
 export enum API_URL {
   authenticate = 'https://www.strava.com/oauth/token',
   athlete = 'https://www.strava.com/api/v3/athlete',
@@ -15,20 +17,22 @@ export const hasValidToken = () => {
   const secondsSinceEpoch = Math.round(now.getTime() / 1000);
   const tokenIsExpired = secondsSinceEpoch > tokenExpiration;
 
-  return accessToken && !tokenIsExpired;
+  return Boolean(accessToken && !tokenIsExpired);
 };
 
 export const api = async (url: API_URL, method: API_METHOD, body?: {}, callback?: () => void) => {
   const accessToken = localStorage.getItem('seltzerAccess');
   const refreshToken = localStorage.getItem('seltzerRefresh');
 
-  if (!hasValidToken()) {
+  // handle auth
+  if (!hasValidToken() && url !== API_URL.authenticate) {
     if (refreshToken) {
-      window.location.assign('http://localhost:8080/exchange-token');
+      await handleAuthorization(null, refreshToken);
     } else {
       window.location.assign(
         'http://www.strava.com/oauth/authorize?client_id=47529&response_type=code&redirect_uri=http://localhost:8080/exchange_token&approval_prompt=force&scope=read',
       );
+      return;
     }
   }
 

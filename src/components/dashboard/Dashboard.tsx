@@ -14,7 +14,7 @@ const Dashboard: FC = () => {
     fetchAthlete();
   }, []);
 
-  return <Wrapper>Hi {athlete.firstname}</Wrapper>;
+  return <Wrapper>Hi {athlete?.firstname}</Wrapper>;
 };
 
 export default Dashboard;
